@@ -1,0 +1,21 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@babel/core": "^7.27.1",
+    "@babel/generator": "^7.27.1",
+    "@babel/parser": "^7.27.2",
+    "@babel/traverse": "^7.27.1"
+  },
+  "dependencies": {
+    "vm2": "^3.9.19"
+  }
+}
