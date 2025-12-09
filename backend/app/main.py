@@ -41,6 +41,7 @@ def main():
                             verify_code = re.sub(r'\s*', '', verify_code)
                             logger.info(f"====> Email from {email.sender} with verification code: {verify_code}")
                     email = poller.get_message()
+                    
                 logger.info("Polling completed, waiting for next poll...")
             count_flag = poller.next()
     except Exception as e:

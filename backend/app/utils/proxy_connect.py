@@ -90,10 +90,10 @@ async def get_multiple_proxies(
 
 if __name__ == "__main__":
     url = "https://api.ipify.org?format=json"
-    # socks5 proxy
+    # # socks5 proxy
     # proxy = {
-    #     "http://": "socks5://127.0.0.1:10001",
-    #     "https://": "socks5://127.0.0.1:10001"
+    #     "http://": "socks5://192.168.1.100:7890",
+    #     "https://": "socks5://192.168.1.100:7890"
     # }
     # result = asyncio.run(get_info_with_proxy(url, proxy))
     # print(result)
@@ -101,8 +101,13 @@ if __name__ == "__main__":
     proxies = [ {
         "http://": "socks5://127.0.0.1:"+str(10000+port),
         "https://": "socks5://127.0.0.1:"+ str(10000+port)
-    } for port in range(1,70)]
-
+    } for port in range(1,11)]
     results = asyncio.run(get_multiple_proxies(url, proxies))
-    for i, res in enumerate(results):
-        print(f"Proxy {i+1}: {res}")
+    # wirte proxies to file if success
+    with open("../config/proxies.txt", "w") as f:
+        for i, res in enumerate(results):
+            if res.get("status") == "success":
+                f.write(f"{proxies[i]['http://']}\n")
+            else:
+                print(f"Failed to get info with proxy: {proxies[i]['http://']}")
+

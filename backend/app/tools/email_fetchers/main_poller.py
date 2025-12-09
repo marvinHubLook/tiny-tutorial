@@ -302,9 +302,63 @@ class EmailPoller:
         return None
 
 
+def parse_outlook_email_to_config(lines: List[str],
+      proxies: List[str],
+      output_path: str) -> List[Dict[str, Any]]:
+    """解析Outlook邮件格式到配置文件"""
+    accounts = []
+    proxy_index = 0
+    for line in lines:
+        proxy = proxies[proxy_index]
+        proxy_index = (proxy_index + 1) % len(proxies)
+        line = line.split("----")
+        email = line[0]
+        password = line[1]
+        session_id = line[2]
+        project_id = line[3]
+        accounts.append({
+            "id": email,
+            "type": "outlook_imap",
+            "enabled": True,
+            "fetch_interval_seconds": 10,
+            "config": {
+                "username": email,
+                "password": password,
+                "client_id": project_id,
+                "refresh_token": session_id,
+                "mailbox": "INBOX",
+                "proxy": proxy
+            },
+            "fetch_criteria": {
+                "since_date":  datetime.now().strftime("%Y-%m-%d"),
+                "mark_as_read_after_fetch": True
+            }
+        })
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump({"accounts": accounts}, f, indent=4)
+
+
+
+def test_write_config():
+    import os
+    import pathlib
+    project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    # read email from txt file
+    with open(f"{project_path}/config/outlook_email.txt", "r", encoding="utf-8") as f:
+        lines = f.readlines()
+        lines = [line.strip() for line in lines]
+
+    # read proxies from txt file
+    with open(f"{project_path}/config/proxies.txt", "r", encoding="utf-8") as f:
+        proxies = f.readlines()
+        proxies = [line.strip() for line in proxies]
+    output_path =  pathlib.Path(project_path) / "config/email_config.json"
+    parse_outlook_email_to_config(lines, proxies, output_path)
+
+
 def test_main():
     import os,time
-    current_dir = os.path.dirname(os.path.abspath(__file__))
+    current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     config_path = os.path.join(current_dir, "config/email_config.json")
     print(f"Using configuration file: {config_path}")
     poller = EmailPoller(config_path, PollingConfig(
